@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Navbar, Footer, Preloader } from "@/components/ui";
+import { Navbar, Footer, Preloader, FloatingReserveCTA } from "@/components/ui";
 import { SmoothScrollProvider } from "@/components/motion/SmoothScroll";
 import { CustomCursor } from "@/components/motion/CustomCursor";
 import { siteConfig } from "@/data/site-config";
@@ -88,6 +88,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <FloatingReserveCTA />
         </SmoothScrollProvider>
       </body>
     </html>

@@ -1,0 +1,34 @@
+[
+  {
+    "author": "Tanvir Ahmed",
+    "rating": 5,
+    "text": "The Smoked Kacchi Biryani is hands down the best in Dhaka right now. The aroma of charcoal smoke paired with fall-apart tender goat meat is unmatched.",
+    "source": "Google Reviews",
+    "featured": true,
+    "date": "2 days ago"
+  },
+  {
+    "author": "Nusrat Jahan",
+    "rating": 5,
+    "text": "An enchanting dining atmosphere in Dhanmondi. The Royal Shahi Beef Rezala with warm garlic naan took me back to regal Mughal banquets.",
+    "source": "Google Reviews",
+    "featured": true,
+    "date": "1 week ago"
+  },
+  {
+    "author": "David Miller",
+    "rating": 5,
+    "text": "Visiting from London and this was our culinary highlight. The Tandoori Jumbo River Prawns and Saffron Firni are world-class.",
+    "source": "TripAdvisor",
+    "featured": true,
+    "date": "3 weeks ago"
+  },
+  {
+    "author": "Sadia Rahman",
+    "rating": 5,
+    "text": "From table booking to dessert service, Bhojon Bilash delivers pure perfection. The staff is polite, attentive, and the Borhani is perfectly balanced.",
+    "source": "DineOut",
+    "featured": true,
+    "date": "1 month ago"
+  }
+]
