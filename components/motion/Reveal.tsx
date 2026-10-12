@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { fadeUpVariants, transitions } from "@/lib/animations";
+import { transitions } from "@/lib/animations";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 
 interface RevealProps {
@@ -26,11 +26,8 @@ export function Reveal({
   direction = "up",
   offset = 40,
   threshold = 0.15,
-  as: Tag = "div",
 }: RevealProps) {
   const prefersReduced = useReducedMotion();
-
-  const MotionTag = motion.create(Tag);
 
   const directionMap = {
     up: { y: offset, x: 0 },
@@ -44,7 +41,7 @@ export function Reveal({
     : { opacity: 0, ...directionMap[direction] };
 
   return (
-    <MotionTag
+    <motion.div
       className={cn(className)}
       initial={initial}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
@@ -52,6 +49,6 @@ export function Reveal({
       transition={{ ...transitions.smooth, delay }}
     >
       {children}
-    </MotionTag>
+    </motion.div>
   );
 }

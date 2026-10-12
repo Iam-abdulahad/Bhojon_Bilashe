@@ -5,3 +5,6 @@ export { Container } from "./Container";
 export { Input, Textarea, Select } from "./FormFields";
 export { SectionHeading } from "./SectionHeading";
 export { Skeleton } from "./Skeleton";
+export { Navbar } from "./Navbar";
+export { Footer } from "./Footer";
+export { Preloader } from "./Preloader";

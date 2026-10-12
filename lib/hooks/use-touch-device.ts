@@ -1,19 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribe(callback: () => void) {
+  const mql = window.matchMedia("(pointer: coarse)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(pointer: coarse)").matches;
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
 
 /** Detects if the device has a coarse pointer (touch) */
 export function useIsTouchDevice(): boolean {
-  const [isTouch, setIsTouch] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(pointer: coarse)");
-    setIsTouch(mql.matches);
-
-    const handler = (e: MediaQueryListEvent) => setIsTouch(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
-
-  return isTouch;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

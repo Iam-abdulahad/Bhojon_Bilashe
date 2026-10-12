@@ -1,14 +1,16 @@
 "use client";
 
-import { useRef, type MouseEvent, type ButtonHTMLAttributes } from "react";
+import { useRef, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 
+import type { HTMLMotionProps } from "framer-motion";
+
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "default" | "sm" | "lg";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "ref"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   magnetic?: boolean;

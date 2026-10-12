@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useIsTouchDevice } from "@/lib/hooks/use-touch-device";
