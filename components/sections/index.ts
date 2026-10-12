@@ -6,3 +6,7 @@ export { ReservationCTA } from "./ReservationCTA";
 export { ReservationFlow } from "./ReservationFlow";
 export { ContactForm } from "./ContactForm";
 export { ReviewsCarousel } from "./ReviewsCarousel";
+export { StoryTeaser } from "./StoryTeaser";
+export { StatsSection } from "./StatsSection";
+export { GalleryStrip } from "./GalleryStrip";
+export { GalleryClient } from "./GalleryClient";

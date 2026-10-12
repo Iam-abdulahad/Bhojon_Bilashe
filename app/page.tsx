@@ -3,14 +3,14 @@ import {
   HeroMarquee,
   SignatureShowcase,
   MenuPreview,
+  StoryTeaser,
+  StatsSection,
+  GalleryStrip,
   ReviewsCarousel,
   ReservationCTA,
 } from "@/components/sections";
-import { Container } from "@/components/ui";
 import { getMenuItems } from "@/lib/menu-service";
 import { getFeaturedReviews } from "@/lib/reviews-service";
-import { LiveOpenStatusBadge } from "@/components/ui/LiveOpenStatusBadge";
-import { Clock, MapPin, Award } from "lucide-react";
 
 export default async function Home() {
   const dishes = await getMenuItems();
@@ -18,66 +18,36 @@ export default async function Home() {
 
   return (
     <>
-      {/* 1. Cinematic 3D Hero Section */}
+      {/* 1. Preloader (Mounted globally in RootLayout) */}
+
+      {/* 2. Hero — 3D scene + headline */}
       <Hero />
 
-      {/* 2. Marquee strip */}
+      {/* 3. Marquee strip (cuisine keywords / awards) */}
       <HeroMarquee />
 
-      {/* 3. Pinned 3D Signature Showcase */}
+      {/* 4. Signature dishes (scroll-pinned 3D) */}
       <SignatureShowcase dishes={dishes} />
 
-      {/* 4. Menu Preview (top 6 dishes) */}
+      {/* 5. Menu preview (top 6 dishes) */}
       <MenuPreview dishes={dishes} />
 
-      {/* 5. Guest Reviews & Testimonials Carousel */}
+      {/* 6. Story teaser (parallax card + text reveal) */}
+      <StoryTeaser />
+
+      {/* 7. Stats counters (years open, dishes served, happy guests, awards) */}
+      <StatsSection />
+
+      {/* 8. Gallery strip (atmosphere & artistry preview) */}
+      <GalleryStrip />
+
+      {/* 9. Reviews carousel */}
       <ReviewsCarousel reviews={reviews} />
 
-      {/* 6. High-impact Reservation CTA Section */}
+      {/* 10. Reservation CTA (full-width, animated background) */}
       <ReservationCTA />
 
-      {/* 7. Quick Location & Hours Bar */}
-      <section className="relative border-t border-border bg-bg-elevated py-12">
-        <Container>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 text-center md:text-left items-center">
-            <div className="flex items-center gap-4 justify-center md:justify-start">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
-                <Clock className="h-6 w-6" />
-              </div>
-              <div>
-                <LiveOpenStatusBadge />
-                <p className="font-display text-sm text-cream mt-1">
-                  Sat–Thu 11:00–23:00 · Fri 14:00–23:00
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 justify-center md:justify-start">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 text-accent">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-label text-xs text-accent">VISIT OUR DINING ROOM</p>
-                <p className="font-display text-sm text-cream">
-                  House 12, Road 5, Dhanmondi, Dhaka
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 justify-center md:justify-end">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-herb/20 text-herb">
-                <Award className="h-6 w-6" />
-              </div>
-              <div className="text-left">
-                <p className="font-label text-xs text-herb">EXCELLENCE AWARD</p>
-                <p className="font-display text-sm text-cream">
-                  Dhaka Best Heritage Dining 2026
-                </p>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
+      {/* 11. Footer (Mounted globally in RootLayout with hours, map, socials) */}
     </>
   );
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar, Footer, Preloader, FloatingReserveCTA } from "@/components/ui";
 import { SmoothScrollProvider } from "@/components/motion/SmoothScroll";
 import { CustomCursor } from "@/components/motion/CustomCursor";
+import { RouteTransition } from "@/components/motion";
 import { siteConfig } from "@/data/site-config";
 
 const playfair = Playfair_Display({
@@ -84,9 +85,11 @@ export default function RootLayout({
 
         <SmoothScrollProvider>
           <Navbar />
-          <main id="main-content" className="flex-1">
-            {children}
-          </main>
+          <RouteTransition>
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+          </RouteTransition>
           <Footer />
           <FloatingReserveCTA />
         </SmoothScrollProvider>
