@@ -5,6 +5,7 @@ import { Navbar, Footer, Preloader, FloatingReserveCTA } from "@/components/ui";
 import { SmoothScrollProvider } from "@/components/motion/SmoothScroll";
 import { CustomCursor } from "@/components/motion/CustomCursor";
 import { RouteTransition } from "@/components/motion";
+import { RestaurantJsonLd } from "@/components/seo/RestaurantJsonLd";
 import { siteConfig } from "@/data/site-config";
 
 const playfair = Playfair_Display({
@@ -69,6 +70,9 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg text-cream selection:bg-primary/30 selection:text-cream">
+        {/* Global JSON-LD structured data */}
+        <RestaurantJsonLd />
+
         {/* Accessibility skip to main content */}
         <a href="#main-content" className="skip-to-content">
           Skip to main content
