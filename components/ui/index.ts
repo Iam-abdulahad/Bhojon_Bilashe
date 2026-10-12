@@ -8,3 +8,4 @@ export { Skeleton } from "./Skeleton";
 export { Navbar } from "./Navbar";
 export { Footer } from "./Footer";
 export { Preloader } from "./Preloader";
+export { DishCard } from "./DishCard";
