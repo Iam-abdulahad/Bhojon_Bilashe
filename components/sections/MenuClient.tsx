@@ -183,8 +183,8 @@ export function MenuClient({ initialDishes }: MenuClientProps) {
         {/* Grid of Dishes with Animated Layout */}
         <motion.div layout className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
-            {filteredDishes.map((dish) => (
-              <DishCard key={dish.slug} dish={dish} />
+            {filteredDishes.map((dish, index) => (
+              <DishCard key={dish.slug} dish={dish} priority={index === 0} />
             ))}
           </AnimatePresence>
         </motion.div>

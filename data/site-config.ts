@@ -13,7 +13,8 @@ export const siteConfig = {
 
   contact: {
     phone: "+880 1700-000000",
-    whatsapp: "+8801700000000",
+    // Set the restaurant's real WhatsApp number before accepting orders.
+    whatsapp: "",
     email: "hello@bhojonbilash.com",
     address: "House 12, Road 5, Dhanmondi, Dhaka 1205, Bangladesh",
     mapCoords: { lat: 23.7461, lng: 90.3742 },

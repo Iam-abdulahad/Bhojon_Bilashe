@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getMenuItemBySlug, getMenuItems } from "@/lib/menu-service";
 import { Container, Button, Chip, DishCard } from "@/components/ui";
 import { DishOrbitViewer } from "@/components/three/DishOrbitViewer";
+import { AddToOrderButton } from "@/components/order/AddToOrderButton";
 import { siteConfig } from "@/data/site-config";
 import { ArrowLeft, Clock, Flame, Calendar } from "lucide-react";
 
@@ -166,14 +167,18 @@ export default async function DishDetailPage({ params }: DishPageProps) {
 
               {/* Primary Action Buttons */}
               <div className="flex flex-wrap gap-4 pt-2">
+                <AddToOrderButton
+                  dish={dish}
+                  className="min-h-14 px-6 text-sm"
+                />
                 <Link href="/reservation">
                   <Button variant="primary" size="lg" className="shadow-glow gap-2">
                     <Calendar className="h-4 w-4" /> Reserve Table for Dining
                   </Button>
                 </Link>
-                <Link href="tel:+8801700000000">
+                <Link href={`tel:${siteConfig.contact.phone}`}>
                   <Button variant="secondary" size="lg">
-                    Order via Phone
+                    Call to Order
                   </Button>
                 </Link>
               </div>

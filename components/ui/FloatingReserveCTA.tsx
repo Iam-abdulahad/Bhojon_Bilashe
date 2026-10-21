@@ -4,16 +4,18 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar } from "lucide-react";
+import { useOrder } from "@/components/order/OrderExperience";
 
 export function FloatingReserveCTA() {
   const pathname = usePathname();
+  const { itemCount } = useOrder();
 
   // Hide on reservation page
   const isReservationPage = pathname === "/reservation";
 
   return (
     <AnimatePresence>
-      {!isReservationPage && (
+      {!isReservationPage && itemCount === 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}

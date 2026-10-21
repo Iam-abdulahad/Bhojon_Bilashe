@@ -7,6 +7,7 @@ import { CustomCursor } from "@/components/motion/CustomCursor";
 import { RouteTransition } from "@/components/motion";
 import { RestaurantJsonLd } from "@/components/seo/RestaurantJsonLd";
 import { siteConfig } from "@/data/site-config";
+import { OrderExperience } from "@/components/order/OrderExperience";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -88,14 +89,16 @@ export default function RootLayout({
         <Preloader />
 
         <SmoothScrollProvider>
-          <Navbar />
-          <RouteTransition>
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-          </RouteTransition>
-          <Footer />
-          <FloatingReserveCTA />
+          <OrderExperience>
+            <Navbar />
+            <RouteTransition>
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
+            </RouteTransition>
+            <Footer />
+            <FloatingReserveCTA />
+          </OrderExperience>
         </SmoothScrollProvider>
       </body>
     </html>

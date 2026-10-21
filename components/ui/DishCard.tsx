@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Chip } from "@/components/ui/Chip";
-import { Button } from "@/components/ui/Button";
+import { AddToOrderButton } from "@/components/order/AddToOrderButton";
 import { MenuItemData } from "@/lib/menu-service";
-import { Box, Sparkles, Clock } from "lucide-react";
+import { ArrowUpRight, Box, Clock, Sparkles } from "lucide-react";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
+import { getDishImage } from "@/lib/dish-images";
 
 interface DishCardProps {
   dish: MenuItemData;
+  priority?: boolean;
 }
 
-export function DishCard({ dish }: DishCardProps) {
+export function DishCard({ dish, priority = false }: DishCardProps) {
   const prefersReduced = useReducedMotion();
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
@@ -37,13 +40,13 @@ export function DishCard({ dish }: DishCardProps) {
   };
 
   return (
-    <motion.div
+    <motion.article
       layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.35 }}
-      className="group relative flex flex-col justify-between rounded-card border border-border bg-bg-elevated p-5 transition-shadow duration-300 hover:border-cream/20 hover:shadow-glow"
+      initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+      transition={{ duration: prefersReduced ? 0 : 0.36, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-bg-elevated transition-[border-color,box-shadow] duration-300 hover:border-accent/35 hover:shadow-[0_18px_48px_rgba(0,0,0,0.32)]"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={
@@ -56,71 +59,80 @@ export function DishCard({ dish }: DishCardProps) {
       }
       data-cursor-label="View"
     >
-      <div>
-        {/* Dish Visual Card Canvas / Fallback Banner */}
-        <div className="relative mb-4 aspect-[4/3] w-full overflow-hidden rounded-xl border border-border/80 bg-gradient-to-br from-bg-soft via-[#2A1812] to-bg-elevated flex items-center justify-center">
-          {/* Decorative food plate art preview */}
-          <div className="relative flex h-32 w-32 items-center justify-center rounded-full border border-accent/30 bg-radial from-primary/30 to-bg-elevated shadow-gold transition-transform duration-500 ease-smooth group-hover:scale-105">
-            <span className="font-display text-2xl font-bold text-accent">
-              {dish.category === "Drinks" ? "🍸" : dish.category === "Desserts" ? "🍮" : "🍲"}
-            </span>
-          </div>
-
-          {/* Quick Tag Overlays */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            {dish.tags.slice(0, 2).map((tag) => (
-              <Chip key={tag} variant={getTagVariant(tag)}>
-                {tag}
-              </Chip>
-            ))}
-          </div>
-
-          {/* Preparation Time Badge */}
-          {dish.preparationTime && (
-            <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-bg/80 px-2.5 py-1 text-[10px] font-medium text-muted backdrop-blur-md">
-              <Clock className="h-3 w-3 text-accent" />
-              <span>{dish.preparationTime}</span>
-            </div>
-          )}
+      <Link
+        href={`/menu/${dish.slug}`}
+        className="relative block aspect-[1.42/1] overflow-hidden bg-bg-soft"
+        aria-label={`View ${dish.name} details`}
+      >
+        <Image
+          src={getDishImage(dish)}
+          alt={dish.name}
+          fill
+          sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
+          loading={priority ? "eager" : "lazy"}
+          className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.06]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated via-bg-elevated/10 to-transparent opacity-90" />
+        <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">
+          {dish.tags.slice(0, 2).map((tag) => (
+            <Chip key={tag} variant={getTagVariant(tag)} className="border-white/15 bg-bg/70 backdrop-blur-md">
+              {tag}
+            </Chip>
+          ))}
         </div>
+        {dish.preparationTime && (
+          <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-bg/70 px-3 py-1.5 text-[11px] font-medium text-cream backdrop-blur-md">
+            <Clock className="h-3.5 w-3.5 text-accent" />
+            <span>{dish.preparationTime}</span>
+          </div>
+        )}
+      </Link>
 
-        {/* Title & Price Line */}
-        <div className="mb-2 flex items-baseline justify-between gap-2">
-          <Link href={`/menu/${dish.slug}`}>
-            <h3 className="font-display text-lg font-bold text-cream transition-colors group-hover:text-accent">
-              {dish.name}
-            </h3>
-          </Link>
-          <span className="font-display text-xl font-bold text-accent tabular-nums shrink-0">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="mb-2 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="mb-1.5 font-label text-[9px] tracking-[0.2em] text-accent">
+              {dish.category}
+            </p>
+            <Link href={`/menu/${dish.slug}`} className="group/title">
+              <h3 className="font-display text-lg font-bold leading-snug text-cream transition-colors group-hover/title:text-accent sm:text-xl">
+                {dish.name}
+              </h3>
+            </Link>
+          </div>
+          <span className="shrink-0 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 font-display text-base font-bold text-accent tabular-nums">
             ৳{dish.price}
           </span>
         </div>
 
-        {/* Description */}
-        <p className="line-clamp-2 text-xs text-muted leading-relaxed mb-4">
+        <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-muted">
           {dish.description}
         </p>
-      </div>
 
-      {/* Action Footer */}
-      <div className="flex items-center justify-between border-t border-border/60 pt-3 text-xs">
-        {dish.model3d ? (
-          <Link href={`/menu/${dish.slug}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent hover:text-primary transition-colors">
-            <Box className="h-3.5 w-3.5" />
-            <span>Interactive 3D</span>
-          </Link>
-        ) : (
-          <span className="text-[11px] text-muted flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-herb" /> Fresh Kitchen
-          </span>
-        )}
-
-        <Link href={`/menu/${dish.slug}`}>
-          <Button variant="ghost" size="sm" className="p-0 text-xs text-cream hover:text-accent">
-            Details →
-          </Button>
-        </Link>
+        <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/70 pt-4">
+          {dish.model3d ? (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted">
+              <Box className="h-3.5 w-3.5 text-accent" />
+              3D dish view
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted">
+              <Sparkles className="h-3.5 w-3.5 text-herb" />
+              Fresh from our kitchen
+            </span>
+          )}
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/menu/${dish.slug}`}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-cream transition-colors hover:border-accent hover:text-accent"
+              aria-label={`View ${dish.name} details`}
+            >
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+            <AddToOrderButton dish={dish} />
+          </div>
+        </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
