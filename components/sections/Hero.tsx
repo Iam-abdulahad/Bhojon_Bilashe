@@ -1,64 +1,86 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowDown, Flame, Utensils } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Flame,
+  MapPin,
+  Phone,
+  Utensils,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { IconicFoodStage } from "@/components/sections/IconicFoodStage";
+import { siteConfig } from "@/data/site-config";
 
 export function Hero() {
   return (
     <section
-      className="relative min-h-screen w-full overflow-hidden bg-radial from-[#2A1812] via-[#140D0B] to-[#0B0807] pt-24 pb-12 flex flex-col justify-between"
-      aria-label="Welcome and signature dishes hero section"
+      className="relative flex min-h-svh w-full flex-col justify-between overflow-hidden bg-bg"
+      aria-label="Welcome to Bhojon Bilash"
     >
-      {/* Background ambient light glow */}
-      <div
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[140px]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute bottom-10 right-10 h-72 w-72 rounded-full bg-accent/10 blur-[100px]"
-        aria-hidden="true"
-      />
+      {/* Background Image & Overlay Gradients */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <Image
+          src="/images/thumbnail.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[68%_center] md:object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg/40 via-bg/40 to-bg md:bg-gradient-to-r md:from-[#100804] md:from-5% md:via-[#100804]/95 md:via-40% md:to-[#100804]/10 md:to-80%" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent md:from-bg/80 md:via-transparent md:to-transparent" />
+      </div>
 
-      <div className="container-content relative z-10 grid flex-1 grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
-        {/* Left column: Text storytelling & CTAs */}
-        <div className="flex flex-col justify-center text-left lg:col-span-6 pt-8 lg:pt-0">
-          {/* Eyebrow badge */}
+      {/* Main Content Area - Auto-centered within available height */}
+      <div className="container-content relative z-10 flex flex-1 flex-col justify-center pt-20 pb-6 sm:pt-24 lg:pt-28 lg:pb-10">
+        <div className="w-full max-w-2xl">
           <Reveal delay={0.1}>
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-widest text-primary mb-6">
-              <Flame className="h-3.5 w-3.5 text-primary" />
+            <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-primary/60 bg-bg/55 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent backdrop-blur-sm sm:mb-5 sm:px-4 sm:py-2 sm:text-xs">
+              <Flame className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" />
               <span>Authentic Heritage Dining</span>
             </div>
           </Reveal>
 
-          {/* Main Headline */}
-          <h1 className="font-display text-[clamp(2.5rem,5.5vw,5rem)] font-extrabold leading-[1.05] tracking-tight text-cream mb-6">
-            Where Fire Meets Spice &{" "}
-            <span className="text-gradient">Tradition</span> Meets Soul.
-          </h1>
+          <Reveal delay={0.18}>
+            <h1 className="mb-4 max-w-[13ch] font-display text-[clamp(2.25rem,5.5vw,5.25rem)] font-bold leading-[1.02] tracking-[-0.04em] text-cream sm:mb-5">
+              Where Fire Meets
+              <span className="block">
+                Spice & <span className="text-gradient">Tradition</span>
+              </span>
+              <span className="block">Meets Soul.</span>
+            </h1>
+          </Reveal>
 
-          {/* Subheadline description */}
-          <Reveal delay={0.25}>
-            <p className="prose-width text-base md:text-lg text-muted mb-8 leading-relaxed">
-              Step into Dhaka’s sanctuary of slow-cooked biryanis, open-flame
-              tandoor grills, and generational recipes crafted with passion in
-              the heart of Dhanmondi.
+          <Reveal delay={0.26}>
+            <p className="mb-5 max-w-xl text-xs leading-relaxed text-cream/75 sm:mb-7 sm:text-base md:text-lg">
+              Step into Dhaka&apos;s sanctuary of slow-cooked biryanis,
+              open-flame tandoor grills, and generational recipes crafted with
+              passion in the heart of Dhanmondi.
             </p>
           </Reveal>
 
-          {/* Primary & Secondary CTAs */}
-          <Reveal delay={0.35}>
-            <div className="flex flex-wrap items-center gap-4">
+          <Reveal delay={0.34}>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <Link href="/reservation">
-                <Button size="lg" variant="primary" magnetic className="shadow-glow">
+                <Button
+                  size="lg"
+                  variant="primary"
+                  magnetic
+                  className="gap-2 shadow-glow"
+                >
+                  <CalendarDays className="h-4 w-4" />
                   Reserve a Table
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/menu">
-                <Button size="lg" variant="secondary" magnetic className="gap-2">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  magnetic
+                  className="gap-2 border-accent/40 bg-bg/25"
+                >
                   <Utensils className="h-4 w-4 text-accent" />
                   Explore Full Menu
                 </Button>
@@ -66,42 +88,56 @@ export function Hero() {
             </div>
           </Reveal>
 
-          {/* Mini Trust Stats */}
-          <Reveal delay={0.45}>
-            <div className="mt-12 flex items-center gap-8 border-t border-border/60 pt-6">
+          <Reveal delay={0.42}>
+            <div className="mt-6 flex items-center gap-6 border-t border-cream/20 pt-4 sm:mt-8 sm:gap-8 sm:pt-5">
               <div>
-                <p className="font-display text-2xl font-bold text-accent">4.9 ★</p>
-                <p className="font-label text-[10px] text-muted">2,400+ GUEST REVIEWS</p>
+                <p className="font-display text-xl font-bold leading-tight text-accent sm:text-2xl md:text-3xl">
+                  4.9 ★
+                </p>
+                <p className="mt-0.5 font-label text-[9px] tracking-[0.18em] text-cream/65 sm:text-[10px]">
+                  2,400+ Guest Reviews
+                </p>
               </div>
-              <div className="h-8 w-[1px] bg-border" />
+              <div className="h-8 w-px bg-cream/20 sm:h-10" />
               <div>
-                <p className="font-display text-2xl font-bold text-cream">18+</p>
-                <p className="font-label text-[10px] text-muted">SIGNATURE HERITAGE RECIPES</p>
+                <p className="font-display text-xl font-bold leading-tight text-cream sm:text-2xl md:text-3xl">
+                  18+
+                </p>
+                <p className="mt-0.5 font-label text-[9px] tracking-[0.18em] text-cream/65 sm:text-[10px]">
+                  Signature Heritage Recipes
+                </p>
               </div>
             </div>
           </Reveal>
         </div>
 
-        {/* Right column: interactive 3D food photography showcase */}
-        <div className="relative flex h-[420px] sm:h-[500px] lg:h-[620px] w-full items-center justify-center lg:col-span-6">
-          <IconicFoodStage />
+        {/* Floating Decorative Stamp */}
+        <div className="absolute right-[6%] top-[30%] hidden -rotate-6 text-right text-accent xl:block">
+          <p className="font-display text-2xl italic leading-tight xl:text-3xl">
+            Best Biryani
+            <br />
+            in Town ♡
+          </p>
+          <div className="ml-auto mt-2 h-px w-28 rotate-[-12deg] bg-accent xl:w-32" />
         </div>
       </div>
 
-      {/* Bottom Scroll Indicator */}
-      <div className="container-content relative z-10 flex items-center justify-between pt-6 text-xs text-muted">
-        <span className="font-label text-[10px] tracking-widest text-accent">
-          DHANMONDI · HOUSE 12, ROAD 5
-        </span>
-        <div className="flex items-center gap-2">
-          <span>Scroll down to taste</span>
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          >
-            <ArrowDown className="h-3.5 w-3.5 text-primary" />
-          </motion.div>
+      {/* Footer Info Bar anchored flush to bottom */}
+      <div className="container-content relative z-10 flex shrink-0 items-center justify-between gap-4 border-t border-accent/20 py-3 sm:py-4">
+        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-accent sm:text-xs sm:tracking-[0.2em]">
+          <MapPin className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+          <span>Dhanmondi · House 12, Road 5</span>
         </div>
+        <Link
+          href={`tel:${siteConfig.contact.phone.replace(/[^\d+]/g, "")}`}
+          className="hidden items-center gap-2 text-xs font-medium text-cream/75 transition-colors hover:text-accent sm:inline-flex"
+        >
+          <Phone className="h-3.5 w-3.5 text-accent" />
+          Call {siteConfig.contact.phone}
+        </Link>
+        <span className="font-display text-xs italic text-accent sm:text-sm md:text-base">
+          Good Food <span className="px-1 text-primary">×</span> Great Vibes
+        </span>
       </div>
     </section>
   );
