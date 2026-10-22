@@ -1,25 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowDown, Flame, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { Skeleton } from "@/components/ui/Skeleton";
-
-// Dynamically load 3D Scene with SSR disabled for optimal first-load performance
-const Scene = dynamic(
-  () => import("@/components/three/Scene").then((mod) => mod.Scene),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-full w-full items-center justify-center">
-        <Skeleton shape="circle" className="h-64 w-64 md:h-80 md:w-80" />
-      </div>
-    ),
-  }
-);
+import { IconicFoodStage } from "@/components/sections/IconicFoodStage";
 
 export function Hero() {
   return (
@@ -96,14 +82,9 @@ export function Hero() {
           </Reveal>
         </div>
 
-        {/* Right column: 3D interactive dish showcase */}
+        {/* Right column: interactive 3D food photography showcase */}
         <div className="relative flex h-[420px] sm:h-[500px] lg:h-[620px] w-full items-center justify-center lg:col-span-6">
-          <Scene className="h-full w-full" />
-
-          {/* Interactive Floating Hint */}
-          <div className="pointer-events-none absolute bottom-4 right-4 rounded-full border border-border/80 bg-bg-elevated/70 px-3 py-1 text-[11px] font-medium text-muted backdrop-blur-sm">
-            Drag / move cursor to interact
-          </div>
+          <IconicFoodStage />
         </div>
       </div>
 
