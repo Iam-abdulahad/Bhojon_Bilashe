@@ -23,7 +23,7 @@ export async function GET(
   } catch (error) {
     console.error("GET /api/menu/[slug] failed:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch dish details" },
+      { success: false, error: "We couldn't load this dish right now. Please return to the menu and try again." },
       { status: 500 }
     );
   }

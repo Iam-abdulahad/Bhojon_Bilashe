@@ -1,7 +1,10 @@
 import fs from "fs";
 import path from "path";
+import { loadEnvConfig } from "@next/env";
 import mongoose from "mongoose";
 import { MenuItem } from "../models/MenuItem";
+
+loadEnvConfig(process.cwd());
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/bhojon-bilash";
 
@@ -13,7 +16,7 @@ async function seed() {
   const dishes = JSON.parse(rawData);
 
   try {
-    console.log(`Connecting to MongoDB at: ${MONGODB_URI}`);
+    console.log("Connecting to MongoDB...");
     await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
     console.log("Connected to MongoDB successfully.");
 

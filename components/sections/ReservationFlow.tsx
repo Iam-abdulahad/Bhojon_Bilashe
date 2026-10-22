@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { reservationSchema, ReservationFormData } from "@/lib/validations";
 import { Button, Input, Textarea } from "@/components/ui";
+import { siteConfig } from "@/data/site-config";
 import { Calendar, Users, UserCheck, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
 import Link from "next/link";
 
@@ -26,10 +27,12 @@ export function ReservationFlow() {
   const [currentStep, setCurrentStep] = useState(1);
   const [slots, setSlots] = useState<SlotInfo[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submittedData, setSubmittedData] = useState<{
     id: string;
     data: ReservationFormData;
+    warning?: string;
   } | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -37,8 +40,9 @@ export function ReservationFlow() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
+    setError,
     trigger,
     formState: { errors },
   } = useForm<ReservationFormData>({
@@ -56,9 +60,9 @@ export function ReservationFlow() {
     mode: "onBlur",
   });
 
-  const selectedDate = watch("date");
-  const selectedTime = watch("time");
-  const selectedGuests = watch("guests");
+  const selectedDate = useWatch({ control, name: "date" });
+  const selectedTime = useWatch({ control, name: "time" });
+  const selectedGuests = useWatch({ control, name: "guests" });
 
   // Fetch slots whenever selectedDate changes
   useEffect(() => {
@@ -67,22 +71,45 @@ export function ReservationFlow() {
 
     async function fetchAvailability() {
       setLoadingSlots(true);
+      setAvailabilityError(null);
       try {
-        const res = await fetch(`/api/reservations/availability?date=${selectedDate}`);
-        const data = await res.json();
-        if (!isCancelled && data.slots) {
-          setSlots(data.slots);
+        const res = await fetch(
+          `/api/reservations/availability?date=${encodeURIComponent(selectedDate)}`
+        );
+        const result = await res.json().catch(() => null) as {
+          success?: boolean;
+          error?: string;
+          slots?: SlotInfo[];
+        } | null;
+
+        if (!res.ok || !result?.success || !Array.isArray(result.slots)) {
+          throw new Error(
+            result?.error ?? "We couldn't check availability. Please try again."
+          );
+        }
+
+        if (!isCancelled) {
+          setAvailabilityError(null);
+          const slotsForDate = result.slots;
+          setSlots(slotsForDate);
           // If current selected time is not available in new date, pick first available
-          const currentAvailable = data.slots.find(
+          const currentAvailable = slotsForDate.find(
             (s: SlotInfo) => s.time === selectedTime && s.available
           );
           if (!currentAvailable) {
-            const firstAvailable = data.slots.find((s: SlotInfo) => s.available);
+            const firstAvailable = slotsForDate.find((s: SlotInfo) => s.available);
             if (firstAvailable) setValue("time", firstAvailable.time);
           }
         }
       } catch (err) {
-        console.error("Availability fetch error:", err);
+        if (!isCancelled) {
+          setSlots([]);
+          setAvailabilityError(
+            err instanceof Error
+              ? err.message
+              : "We couldn't check availability. Please try again or call us."
+          );
+        }
       } finally {
         if (!isCancelled) setLoadingSlots(false);
       }
@@ -118,16 +145,46 @@ export function ReservationFlow() {
         body: JSON.stringify(values),
       });
 
-      const result = await res.json();
+      const result = await res.json().catch(() => null) as {
+        success?: boolean;
+        error?: string;
+        reservationId?: string;
+        warning?: string;
+        details?: Partial<Record<keyof ReservationFormData, string[]>>;
+      } | null;
 
-      if (res.ok && result.success) {
-        setSubmittedData({ id: result.reservationId, data: values });
+      if (res.ok && result?.success && result.reservationId) {
+        setSubmittedData({
+          id: result.reservationId,
+          data: values,
+          warning: result.warning,
+        });
         setCurrentStep(4);
       } else {
-        setApiError(result.error || "Failed to confirm table reservation.");
+        for (const field of [
+          "date",
+          "time",
+          "guests",
+          "name",
+          "phone",
+          "email",
+          "notes",
+        ] as const) {
+          const message = result?.details?.[field]?.[0];
+          if (message) setError(field, { message });
+        }
+        if (result?.details?.date || result?.details?.time) {
+          setCurrentStep(1);
+        }
+        setApiError(
+          result?.error ??
+            "We couldn't confirm your table. Please try again or call us directly."
+        );
       }
     } catch {
-      setApiError("Network error. Please try calling us at +880 1700-000000.");
+      setApiError(
+        `We couldn't reach the reservation service. Please check your connection and try again, or call us at ${siteConfig.contact.phone}.`
+      );
     } finally {
       setSubmitting(false);
     }
@@ -168,7 +225,7 @@ export function ReservationFlow() {
       </div>
 
       {apiError && (
-        <div className="mb-6 flex items-center gap-3 rounded-lg border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
+        <div role="alert" aria-live="polite" className="mb-6 flex items-center gap-3 rounded-lg border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <span>{apiError}</span>
         </div>
@@ -222,6 +279,14 @@ export function ReservationFlow() {
                   <div className="py-8 text-center text-sm text-muted">
                     Checking kitchen & table availability...
                   </div>
+                ) : availabilityError ? (
+                  <p role="alert" className="rounded-lg border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
+                    {availabilityError} Please try changing the date or call {siteConfig.contact.phone}.
+                  </p>
+                ) : slots.length === 0 ? (
+                  <p className="py-8 text-center text-sm text-muted">
+                    No reservation times are available for this date. Please choose another date or call us.
+                  </p>
                 ) : (
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5">
                     {slots.map((slot) => {
@@ -255,7 +320,13 @@ export function ReservationFlow() {
               </div>
 
               <div className="mt-4 flex justify-end">
-                <Button type="button" variant="primary" size="lg" onClick={handleNextFromStep1}>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  onClick={handleNextFromStep1}
+                  disabled={loadingSlots || Boolean(availabilityError) || !slots.some((slot) => slot.available)}
+                >
                   Continue to Guests →
                 </Button>
               </div>
@@ -338,7 +409,7 @@ export function ReservationFlow() {
                   Contact Information
                 </h3>
                 <p className="text-xs text-muted">
-                  We will send a reservation confirmation instantly via SMS and Email.
+                  Add your email to receive a confirmation receipt. Keep your booking reference for your records.
                 </p>
               </div>
 
@@ -421,6 +492,11 @@ export function ReservationFlow() {
               <p className="max-w-md text-sm text-muted mb-6">
                 Thank you, <strong>{submittedData.data.name}</strong>. Your dining experience at Bhojon Bilash has been confirmed.
               </p>
+              {submittedData.warning && (
+                <p role="status" className="mb-6 max-w-md rounded-lg border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
+                  {submittedData.warning}
+                </p>
+              )}
 
               <div className="w-full max-w-md rounded-2xl border border-accent/30 bg-bg-soft p-5 text-left text-xs mb-8">
                 <div className="flex justify-between py-1.5 border-b border-border/40">
@@ -437,7 +513,7 @@ export function ReservationFlow() {
                 </div>
                 <div className="flex justify-between py-1.5">
                   <span className="text-muted">Restaurant Address:</span>
-                  <span className="text-cream">House 12, Rd 5, Dhanmondi</span>
+                  <span className="text-cream">{siteConfig.contact.address}</span>
                 </div>
               </div>
 

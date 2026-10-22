@@ -14,6 +14,13 @@ export async function GET(request: NextRequest) {
       ? Number(searchParams.get("maxPrice"))
       : undefined;
 
+    if (maxPrice !== undefined && (!Number.isFinite(maxPrice) || maxPrice < 0)) {
+      return NextResponse.json(
+        { success: false, error: "Maximum price must be a valid non-negative number." },
+        { status: 400 }
+      );
+    }
+
     const items = await getMenuItems({
       category,
       search,
@@ -30,7 +37,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("GET /api/menu failed:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch menu items" },
+      { success: false, error: "We couldn't load the menu right now. Please refresh and try again." },
       { status: 500 }
     );
   }

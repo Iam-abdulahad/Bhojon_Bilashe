@@ -16,6 +16,7 @@ export function ContactForm() {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -40,15 +41,29 @@ export function ContactForm() {
         body: JSON.stringify(values),
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const result = await res.json().catch(() => null) as {
+        success?: boolean;
+        error?: string;
+        details?: Partial<Record<keyof ContactFormData, string[]>>;
+      } | null;
+
+      if (res.ok && result?.success) {
         setSubmitted(true);
         reset();
       } else {
-        setApiError(data.error || "Failed to deliver message.");
+        for (const field of ["name", "email", "phone", "subject", "message"] as const) {
+          const message = result?.details?.[field]?.[0];
+          if (message) setError(field, { message });
+        }
+        setApiError(
+          result?.error ??
+            "We couldn't send your message. Please try again or contact the restaurant by phone."
+        );
       }
     } catch {
-      setApiError("Network error. Please try calling us directly.");
+      setApiError(
+        "We couldn't reach the restaurant's message service. Please check your connection and try again, or call us directly."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -85,7 +100,7 @@ export function ContactForm() {
       />
 
       {apiError && (
-        <div className="flex items-center gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3.5 text-xs text-danger">
+        <div role="alert" aria-live="polite" className="flex items-center gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3.5 text-xs text-danger">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{apiError}</span>
         </div>

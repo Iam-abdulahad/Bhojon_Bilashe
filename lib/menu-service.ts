@@ -28,7 +28,7 @@ function loadJsonFallback(): MenuItemData[] {
     return JSON.parse(fileContents);
   } catch (err) {
     console.error("Failed to read menu.json fallback:", err);
-    return [];
+    throw new Error("Menu data is unavailable.", { cause: err });
   }
 }
 
@@ -53,7 +53,7 @@ export async function getMenuItems(filters?: {
       if (filters?.isSignature !== undefined) {
         query.isSignature = filters.isSignature;
       }
-      if (filters?.maxPrice) {
+      if (filters?.maxPrice !== undefined) {
         query.price = { $lte: filters.maxPrice };
       }
       if (filters?.search) {
@@ -82,7 +82,7 @@ export async function getMenuItems(filters?: {
   if (filters?.isSignature !== undefined) {
     items = items.filter((item) => item.isSignature === filters.isSignature);
   }
-  if (filters?.maxPrice) {
+  if (filters?.maxPrice !== undefined) {
     items = items.filter((item) => item.price <= filters.maxPrice!);
   }
   if (filters?.search) {

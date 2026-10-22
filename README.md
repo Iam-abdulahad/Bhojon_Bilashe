@@ -1,37 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bhojon Bilash
 
-## Getting Started
+Restaurant website built with Next.js, TypeScript, MongoDB/Mongoose, and Tailwind CSS.
 
-First, run the development server:
+## Local development
+
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env.local` and provide the required values.
+3. Start the app with `npm run dev`.
+4. Open <http://localhost:3000>.
+
+Menu and reviews can use the checked-in JSON data when MongoDB is unavailable. Reservations require a working MongoDB connection; the API will report an error rather than claim a reservation was saved when the database is offline.
+
+## Environment variables
+
+- `MONGODB_URI` — MongoDB connection string. Keep it server-side and never prefix it with `NEXT_PUBLIC_`.
+- `EMAIL_PROVIDER` — `resend` in production. `console` is only a local development preview and does not deliver email in production.
+- `RESEND_API_KEY` — Required when `EMAIL_PROVIDER=resend`.
+- `EMAIL_FROM` — Sender address verified with Resend.
+- `ADMIN_EMAIL` — Destination for contact-form messages.
+- `NEXT_PUBLIC_WHATSAPP_NUMBER` — Restaurant WhatsApp number in international digits-only format; public by design.
+
+The restaurant phone, WhatsApp number, site URL, address, and other public details are in `data/site-config.ts`. Replace the placeholder business details before launch.
+
+## Production checks
+
+Run these commands before deployment:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npx tsc --noEmit
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Deploy as a Node.js Next.js app (not a static export) because reservations and contact forms use server route handlers. Configure production environment variables in the hosting provider, allow the deployed server to connect to MongoDB in the MongoDB network settings, and verify the production domain, email sender, business contact details, and WhatsApp number.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# Bhojon_Bilashe_NextJs
+After deployment, test the menu, dish pages, reservation availability and booking, contact-form delivery, order-to-WhatsApp flow, and mobile layout on the production domain. Do not run `npm run seed` against a production database unless intentionally replacing all menu records; the script clears the existing menu collection first.

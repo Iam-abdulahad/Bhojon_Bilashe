@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Find Bhojon Bilash in Dhanmondi, Dhaka. Get directions, view opening hours, call or WhatsApp our kitchen, and send inquiries.",
 };
 
+const whatsappNumber = siteConfig.contact.whatsapp.replace(/[^0-9]/g, "");
+
 export default function ContactPage() {
   return (
     <div className="pt-28 pb-20 bg-bg min-h-screen text-cream">
@@ -56,9 +58,13 @@ export default function ContactPage() {
               </a>
 
               <a
-                href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}`}
-                target="_blank"
-                rel="noreferrer"
+                href={
+                  whatsappNumber
+                    ? `https://wa.me/${whatsappNumber}`
+                    : `tel:${siteConfig.contact.phone}`
+                }
+                target={whatsappNumber ? "_blank" : undefined}
+                rel={whatsappNumber ? "noreferrer" : undefined}
                 className="flex items-center justify-between rounded-xl border border-border bg-bg-elevated p-4 text-cream transition-all hover:border-herb hover:bg-bg-soft"
               >
                 <div className="flex items-center gap-3">
@@ -68,11 +74,13 @@ export default function ContactPage() {
                   <div>
                     <p className="text-xs text-muted">WhatsApp Concierge</p>
                     <p className="font-display text-sm font-bold text-cream">
-                      {siteConfig.contact.whatsapp}
+                      {whatsappNumber || "WhatsApp unavailable — call reception"}
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-semibold text-herb">Chat Live →</span>
+                <span className="text-xs font-semibold text-herb">
+                  {whatsappNumber ? "Chat Live →" : "Call instead →"}
+                </span>
               </a>
 
               <a

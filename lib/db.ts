@@ -30,9 +30,7 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
 
     cached.promise = mongoose
       .connect(MONGODB_URI, opts)
-      .then((m) => {
-        return m;
-      })
+      .then((m) => m)
       .catch((err) => {
         console.warn("MongoDB connection failed or skipped, falling back to JSON data:", err.message);
         cached.promise = null;
@@ -40,11 +38,6 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
       });
   }
 
-  try {
-    cached.conn = await cached.promise;
-  } catch {
-    cached.conn = null;
-  }
-
+  cached.conn = await cached.promise;
   return cached.conn;
 }

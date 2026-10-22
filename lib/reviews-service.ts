@@ -32,6 +32,6 @@ export async function getFeaturedReviews(): Promise<ReviewData[]> {
     return JSON.parse(raw);
   } catch (err) {
     console.error("Error reading reviews.json:", err);
-    return [];
+    throw new Error("Review data is unavailable.", { cause: err });
   }
 }

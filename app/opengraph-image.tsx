@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/data/site-config";
 
-export const runtime = "edge";
 export const alt = "Bhojon Bilash — Taste the Tradition";
 export const size = {
   width: 1200,

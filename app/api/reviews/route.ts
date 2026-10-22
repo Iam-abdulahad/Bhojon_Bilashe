@@ -15,7 +15,7 @@ export async function GET() {
   } catch (error) {
     console.error("GET /api/reviews failed:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch reviews" },
+      { success: false, error: "We couldn't load guest reviews right now. Please try again later." },
       { status: 500 }
     );
   }

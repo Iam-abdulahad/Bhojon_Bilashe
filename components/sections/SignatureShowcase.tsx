@@ -121,7 +121,7 @@ export function SignatureShowcase({ dishes }: SignatureShowcaseProps) {
               <ChefHat className="h-4 w-4 text-accent" />
 
               <span className="font-label text-[10px] tracking-[0.2em] text-accent sm:text-xs">
-                OUR CHEF'S SELECTION
+                OUR CHEF&apos;S SELECTION
               </span>
             </div>
 
@@ -380,7 +380,7 @@ export function SignatureShowcase({ dishes }: SignatureShowcaseProps) {
               >
                 {/* Dish labels */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <Chip variant="chef">Chef's Signature</Chip>
+                  <Chip variant="chef">Chef&apos;s Signature</Chip>
 
                   {currentDish.tags.slice(0, 1).map((tag) => (
                     <Chip key={tag} variant="spicy">

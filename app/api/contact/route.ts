@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contactSchema } from "@/lib/validations";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { sendNotificationEmail } from "@/lib/email";
+import { escapeHtml, sendNotificationEmail } from "@/lib/email";
+import { siteConfig } from "@/data/site-config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,10 +14,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "We couldn't read your message. Please review the form and try again." },
+        { status: 400 }
+      );
+    }
+
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json(
+        { success: false, error: "Please submit your message using the contact form." },
+        { status: 400 }
+      );
+    }
 
     // Honeypot check
-    if (body.website) {
+    if ("website" in body && body.website) {
       return NextResponse.json(
         { success: false, error: "Bot detected" },
         { status: 400 }
@@ -29,7 +45,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Validation failed",
+          error: "Please correct the highlighted contact details and try again.",
           details: parsed.error.flatten().fieldErrors,
         },
         { status: 400 }
@@ -39,18 +55,28 @@ export async function POST(request: NextRequest) {
     const data = parsed.data;
 
     // Send admin notification
-    await sendNotificationEmail({
-      to: process.env.ADMIN_EMAIL || "hello@bhojonbilash.com",
+    const emailSent = await sendNotificationEmail({
+      to: process.env.ADMIN_EMAIL || siteConfig.contact.email,
       subject: `New Guest Message: ${data.subject} (${data.name})`,
       html: `
-        <h3>Message from ${data.name}</h3>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Phone:</strong> ${data.phone}</p>
-        <p><strong>Subject:</strong> ${data.subject}</p>
+        <h3>Message from ${escapeHtml(data.name)}</h3>
+        <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(data.phone)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(data.subject)}</p>
         <p><strong>Message:</strong></p>
-        <blockquote style="background:#f4f4f4;padding:12px;">${data.message}</blockquote>
+        <blockquote style="background:#f4f4f4;padding:12px;">${escapeHtml(data.message)}</blockquote>
       `,
     });
+
+    if (!emailSent) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `We couldn't send your message right now. Please call ${siteConfig.contact.phone} or email ${siteConfig.contact.email}.`,
+        },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -59,7 +85,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("POST /api/contact failed:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to send message. Please try again." },
+      {
+        success: false,
+        error: "We couldn't send your message right now. Please try again or contact the restaurant by phone or email.",
+      },
       { status: 500 }
     );
   }
