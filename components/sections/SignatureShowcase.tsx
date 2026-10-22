@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -10,21 +10,27 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  ArrowRight,
+  ChefHat,
+  Flame,
+  UtensilsCrossed,
+  ChevronRight,
+} from "lucide-react";
+
 import { Container, Button, Chip } from "@/components/ui";
 import { MenuItemData } from "@/lib/menu-service";
 import { useReducedMotion } from "@/lib/hooks/use-reduced-motion";
 import { useIsTouchDevice } from "@/lib/hooks/use-touch-device";
-import { ArrowRight, ChefHat } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const SHOWCASE_IMAGES: Record<string, string> = {
   "smoked-kacchi-biryani": "/images/IconicFood/Smoked%20Kacchi%20Biryani.jpg",
-  "flame-charred-chicken-tikka": "/images/IconicFood/Flame-Charred%20Chicken%20Tikka.jpg",
-  "royal-shahi-beef-rezala": "/images/IconicFood/Royal%20Shahi%20Beef%20Rezala.jpg",
-  "tandoori-jumbo-river-prawns": "/images/IconicFood/Tandoori%20Jumbo%20River%20Prawns.jpg",
+  "flame-charred-chicken-tikka":
+    "/images/IconicFood/Flame-Charred%20Chicken%20Tikka.jpg",
+  "royal-shahi-beef-rezala":
+    "/images/IconicFood/Royal%20Shahi%20Beef%20Rezala.jpg",
+  "tandoori-jumbo-river-prawns":
+    "/images/IconicFood/Tandoori%20Jumbo%20River%20Prawns.jpg",
 };
 
 interface SignatureShowcaseProps {
@@ -32,57 +38,50 @@ interface SignatureShowcaseProps {
 }
 
 export function SignatureShowcase({ dishes }: SignatureShowcaseProps) {
-  const sectionRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
   const prefersReduced = useReducedMotion();
   const isTouch = useIsTouchDevice();
+
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
-  const rotateX = useSpring(pointerY, { stiffness: 180, damping: 24 });
-  const rotateY = useSpring(pointerX, { stiffness: 180, damping: 24 });
-  const rotation = useMotionTemplate`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-  const signatureList = dishes.filter((d) => d.isSignature).slice(0, 4);
+  const rotateX = useSpring(pointerY, {
+    stiffness: 160,
+    damping: 26,
+  });
 
-  useEffect(() => {
-    // If reduced motion is preferred or mobile touch device, keep snap carousel instead of ScrollTrigger pin
-    if (prefersReduced || isTouch || !sectionRef.current || signatureList.length === 0) {
-      return;
-    }
+  const rotateY = useSpring(pointerX, {
+    stiffness: 160,
+    damping: 26,
+  });
 
-    const trigger = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "top top",
-      end: `+=${signatureList.length * 100}%`,
-      pin: true,
-      scrub: 0.6,
-      onUpdate: (self) => {
-        const step = Math.min(
-          Math.floor(self.progress * signatureList.length),
-          signatureList.length - 1
-        );
-        setActiveIndex(step);
-      },
-    });
+  const rotation = useMotionTemplate`
+    rotateX(${rotateX}deg) rotateY(${rotateY}deg)
+  `;
 
-    return () => {
-      trigger.kill();
-    };
-  }, [prefersReduced, isTouch, signatureList.length]);
+  const signatureList = dishes.filter((dish) => dish.isSignature).slice(0, 4);
 
   if (signatureList.length === 0) return null;
 
-  const currentDish = signatureList[activeIndex] || signatureList[0];
+  const safeIndex = Math.min(activeIndex, signatureList.length - 1);
+
+  const currentDish = signatureList[safeIndex];
+
   const currentImage = SHOWCASE_IMAGES[currentDish.slug] || currentDish.image;
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (prefersReduced || event.pointerType !== "mouse") return;
+    if (prefersReduced || isTouch || event.pointerType !== "mouse") {
+      return;
+    }
 
     const bounds = event.currentTarget.getBoundingClientRect();
+
     const x = (event.clientX - bounds.left) / bounds.width;
     const y = (event.clientY - bounds.top) / bounds.height;
-    pointerY.set((0.5 - y) * 8);
-    pointerX.set((x - 0.5) * 10);
+
+    pointerY.set((0.5 - y) * 5);
+    pointerX.set((x - 0.5) * 6);
   };
 
   const resetTilt = () => {
@@ -90,176 +89,408 @@ export function SignatureShowcase({ dishes }: SignatureShowcaseProps) {
     pointerY.set(0);
   };
 
+  const changeDish = (index: number) => {
+    setActiveIndex(index);
+    resetTilt();
+  };
+
   return (
     <section
-      ref={sectionRef}
-      className="relative min-h-screen w-full bg-radial from-[#22130E] via-[#120B09] to-[#0B0807] py-20 flex flex-col justify-center overflow-hidden border-t border-border"
-      aria-label="Signature dishes pinned showcase"
+      aria-label="Our signature dishes"
+      className="
+        relative isolate overflow-hidden
+        border-t border-border
+        bg-radial from-[#22130E] via-[#120B09] to-[#0B0807]
+        py-16 sm:py-20 lg:py-24
+      "
     >
+      {/* Decorative background accents */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute -right-40 top-20
+          h-96 w-96 rounded-full bg-accent/[0.04] blur-3xl
+        "
+      />
+
       <Container>
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <div className="inline-flex items-center gap-2 text-primary font-label text-xs">
-              <ChefHat className="h-4 w-4" />
-              <span>PINNED 3D SHOWCASE</span>
+        {/* Section heading */}
+        <div className="relative mb-10 flex flex-col gap-6 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/[0.06] px-3.5 py-2">
+              <ChefHat className="h-4 w-4 text-accent" />
+
+              <span className="font-label text-[10px] tracking-[0.2em] text-accent sm:text-xs">
+                OUR CHEF'S SELECTION
+              </span>
             </div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-cream mt-2">
+
+            <h2 className="font-display text-3xl font-bold leading-tight text-cream sm:text-4xl lg:text-5xl">
               Signature <span className="text-gradient">Creations</span>
             </h2>
+
+            <p className="mt-4 max-w-xl text-sm leading-7 text-muted sm:text-base">
+              Discover the dishes that define our kitchen, crafted with
+              carefully selected ingredients, authentic flavours, and a passion
+              for great food.
+            </p>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2">
-            {signatureList.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveIndex(i)}
-                aria-label={`Select signature dish ${i + 1}`}
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  activeIndex === i ? "w-8 bg-accent" : "w-2.5 bg-border hover:bg-cream/40"
-                }`}
-              />
-            ))}
-          </div>
+          <Link
+            href="/menu"
+            className="
+              group inline-flex w-fit shrink-0 items-center gap-2
+              text-sm font-medium text-cream/80
+              transition-colors hover:text-accent
+            "
+          >
+            Explore Full Menu
+            <ArrowRight
+              className="
+                h-4 w-4 transition-transform
+                group-hover:translate-x-1
+              "
+            />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
-          {/* Interactive 3D food photography showcase */}
-          <div className="relative h-[360px] sm:h-[450px] lg:h-[550px] w-full lg:col-span-7 flex items-center justify-center">
-            <div className="h-full w-full" style={{ perspective: 1200 }}>
+        {/* Main showcase */}
+        <div className="grid items-stretch gap-8 lg:grid-cols-12 lg:gap-10">
+          {/* Featured food image */}
+          <div className="min-w-0 lg:col-span-7">
+            <div className="relative" style={{ perspective: 1400 }}>
               <motion.div
-                animate={prefersReduced ? undefined : { y: [0, -5, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="h-full w-full"
+                animate={prefersReduced ? undefined : { y: [0, -4, 0] }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="h-full"
               >
                 <motion.div
                   onPointerMove={handlePointerMove}
                   onPointerLeave={resetTilt}
-                  style={{ transform: rotation, transformStyle: "preserve-3d" }}
-                  className="relative h-full w-full overflow-hidden rounded-[2rem] border border-accent/25 bg-bg-elevated shadow-[0_30px_100px_rgba(0,0,0,0.45)]"
+                  style={{
+                    transform: rotation,
+                    transformStyle: "preserve-3d",
+                  }}
+                  className="
+                    group relative h-[320px] overflow-hidden
+                    rounded-2xl border border-accent/20
+                    bg-bg-elevated
+                    shadow-[0_24px_80px_rgba(0,0,0,0.35)]
+                    sm:h-[430px] sm:rounded-3xl
+                    lg:h-[510px]
+                  "
                 >
-                  <AnimatePresence initial={false}>
+                  <AnimatePresence initial={false} mode="wait">
                     <motion.div
                       key={currentImage}
-                      initial={{ opacity: 0, scale: 1.04 }}
+                      initial={
+                        prefersReduced
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 1.04 }
+                      }
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
                       className="absolute inset-0"
                     >
                       <Image
                         src={currentImage}
                         alt={currentDish.name}
                         fill
-                        priority={activeIndex === 0}
+                        priority={safeIndex === 0}
                         sizes="(max-width: 1023px) 100vw, 58vw"
-                        className="object-cover"
+                        className="
+                          object-cover transition-transform
+                          duration-700 group-hover:scale-[1.035]
+                        "
                       />
                     </motion.div>
                   </AnimatePresence>
 
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg via-bg/10 to-bg/10" />
+                  {/* Image overlay */}
                   <div
-                    className="pointer-events-none absolute left-5 top-5 rounded-full border border-white/15 bg-bg/55 px-3 py-2 font-label text-[10px] tracking-[0.18em] text-accent backdrop-blur-md sm:left-7 sm:top-7"
-                    style={{ transform: "translateZ(36px)" }}
-                  >
-                    SIGNATURE DISH #{activeIndex + 1}
-                  </div>
+                    className="
+                      pointer-events-none absolute inset-0
+                      bg-gradient-to-t
+                      from-[#0B0807] via-[#0B0807]/15
+                      to-[#0B0807]/10
+                    "
+                  />
 
                   <div
-                    className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-8"
-                    style={{ transform: "translateZ(48px)" }}
+                    className="
+                      pointer-events-none absolute inset-x-0 top-0
+                      h-28 bg-gradient-to-b
+                      from-[#0B0807]/50 to-transparent
+                    "
+                  />
+
+                  {/* Top image badge */}
+                  <div
+                    className="
+                      absolute left-4 top-4 z-10
+                      inline-flex items-center gap-2
+                      rounded-full border border-white/15
+                      bg-[#120B09]/65 px-3 py-2
+                      backdrop-blur-md sm:left-6 sm:top-6
+                    "
                   >
-                    <p className="font-label text-[10px] tracking-[0.24em] text-accent">
+                    <Flame className="h-3.5 w-3.5 text-accent" />
+
+                    <span className="font-label text-[9px] tracking-[0.16em] text-cream sm:text-[10px]">
+                      SIGNATURE DISH {String(safeIndex + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  {/* Bottom image caption */}
+                  <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-7 lg:p-8">
+                    <p className="mb-2 font-label text-[9px] tracking-[0.22em] text-accent sm:text-[10px]">
                       FROM OUR OPEN-FLAME KITCHEN
                     </p>
-                    <h3 className="mt-2 font-display text-2xl font-bold text-cream sm:text-3xl">
+
+                    <h3 className="max-w-xl font-display text-2xl font-bold leading-tight text-cream sm:text-3xl lg:text-4xl">
                       {currentDish.name}
                     </h3>
+
+                    <div className="mt-4 flex items-center gap-2 text-xs text-cream/70">
+                      <UtensilsCrossed className="h-3.5 w-3.5 text-accent" />
+
+                      <span>Handcrafted with passion</span>
+                    </div>
                   </div>
                 </motion.div>
               </motion.div>
             </div>
+
+            {/* Desktop and mobile dish selectors */}
+            <div className="mt-5 grid grid-cols-4 gap-2 sm:gap-3">
+              {signatureList.map((dish, index) => {
+                const dishImage = SHOWCASE_IMAGES[dish.slug] || dish.image;
+
+                const isActive = safeIndex === index;
+
+                return (
+                  <button
+                    key={dish.slug}
+                    type="button"
+                    onClick={() => changeDish(index)}
+                    aria-pressed={isActive}
+                    aria-label={`Show ${dish.name}`}
+                    className={`
+                      group relative min-w-0 overflow-hidden
+                      rounded-xl border text-left
+                      transition-all duration-300
+                      focus-visible:outline-none
+                      focus-visible:ring-2
+                      focus-visible:ring-accent
+                      ${
+                        isActive
+                          ? "border-accent shadow-[0_0_0_1px_rgba(0,0,0,0.1)]"
+                          : "border-border hover:border-accent/50"
+                      }
+                    `}
+                  >
+                    <div className="relative h-16 overflow-hidden sm:h-20">
+                      <Image
+                        src={dishImage}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 25vw, 180px"
+                        className={`
+                          object-cover transition-all duration-300
+                          ${
+                            isActive
+                              ? "opacity-100"
+                              : "opacity-55 group-hover:opacity-90"
+                          }
+                        `}
+                      />
+
+                      <div
+                        className={`
+                          absolute inset-0
+                          ${isActive ? "bg-[#120B09]/10" : "bg-[#120B09]/35"}
+                        `}
+                      />
+
+                      <span
+                        className={`
+                          absolute bottom-1.5 right-1.5
+                          flex h-5 w-5 items-center justify-center
+                          rounded-full text-[9px] font-bold
+                          ${
+                            isActive
+                              ? "bg-accent text-[#120B09]"
+                              : "bg-[#120B09]/75 text-cream"
+                          }
+                        `}
+                      >
+                        {index + 1}
+                      </span>
+                    </div>
+
+                    <div
+                      className={`
+                        min-h-[45px] px-1.5 py-2 sm:px-2.5
+                        ${isActive ? "bg-accent/[0.08]" : "bg-bg-elevated"}
+                      `}
+                    >
+                      <p
+                        className={`
+                          line-clamp-2 text-[10px] leading-4
+                          sm:text-xs
+                          ${
+                            isActive ? "font-semibold text-cream" : "text-muted"
+                          }
+                        `}
+                      >
+                        {dish.name}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Cross-fading Dish Info Panel */}
-          <div className="relative min-h-[300px] lg:col-span-5 flex flex-col justify-center">
+          {/* Dish information */}
+          <div
+            className="
+              flex min-w-0 flex-col justify-center
+              rounded-2xl border border-border
+              bg-bg-elevated/70 p-5
+              sm:rounded-3xl sm:p-8
+              lg:col-span-5 lg:p-9
+            "
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentDish.slug}
-                initial={{ opacity: 0, y: 25 }}
+                initial={
+                  prefersReduced ? { opacity: 0 } : { opacity: 0, y: 12 }
+                }
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -25 }}
-                transition={{ duration: 0.45 }}
-                className="flex flex-col gap-4"
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col"
               >
-                <div className="flex items-center gap-2">
-                  <Chip variant="chef">Signature Dish #{activeIndex + 1}</Chip>
-                  {currentDish.tags.slice(0, 1).map((t) => (
-                    <Chip key={t} variant="spicy">
-                      {t}
+                {/* Dish labels */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Chip variant="chef">Chef's Signature</Chip>
+
+                  {currentDish.tags.slice(0, 1).map((tag) => (
+                    <Chip key={tag} variant="spicy">
+                      {tag}
                     </Chip>
                   ))}
                 </div>
 
-                <h3 className="font-display text-3xl sm:text-4xl font-bold text-cream">
+                {/* Title and price */}
+                <h3 className="mt-5 font-display text-2xl font-bold leading-tight text-cream sm:text-3xl">
                   {currentDish.name}
                 </h3>
 
-                <p className="font-display text-2xl font-bold text-accent tabular-nums">
-                  ৳{currentDish.price}
-                </p>
-
-                <p className="text-sm md:text-base text-muted leading-relaxed">
-                  {currentDish.description}
-                </p>
-
-                {currentDish.ingredients && currentDish.ingredients.length > 0 && (
-                  <div className="mt-2">
-                    <p className="font-label text-[10px] text-muted mb-2 tracking-wider">
-                      CRAFTED WITH:
+                <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
+                  <div>
+                    <p className="mb-1 text-[10px] uppercase tracking-[0.16em] text-muted">
+                      Experience the flavour
                     </p>
-                    <div className="flex flex-wrap gap-1.5 text-xs text-cream/80">
-                      {currentDish.ingredients.slice(0, 5).map((ing) => (
-                        <span
-                          key={ing}
-                          className="rounded-md border border-border bg-bg-soft px-2.5 py-1"
-                        >
-                          {ing}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
-                <div className="mt-6 flex flex-wrap items-center gap-4">
-                  <Link href={`/menu/${currentDish.slug}`}>
-                    <Button variant="primary" size="default" magnetic>
-                      View in Full 3D <ArrowRight className="ml-2 h-4 w-4" />
+                    <p className="font-display text-3xl font-bold text-accent sm:text-4xl">
+                      ৳{currentDish.price}
+                    </p>
+                  </div>
+
+                  <span className="pb-1 text-xs text-muted">
+                    Our signature selection
+                  </span>
+                </div>
+
+                {/* Description */}
+                <div className="mt-5">
+                  <p className="mb-2 font-label text-[10px] tracking-[0.18em] text-accent">
+                    THE STORY BEHIND THE DISH
+                  </p>
+
+                  <p className="text-sm leading-7 text-muted sm:text-base">
+                    {currentDish.description}
+                  </p>
+                </div>
+
+                {/* Ingredients */}
+                {currentDish.ingredients &&
+                  currentDish.ingredients.length > 0 && (
+                    <div className="mt-6">
+                      <p className="mb-3 font-label text-[10px] tracking-[0.18em] text-muted">
+                        CRAFTED WITH
+                      </p>
+
+                      <div className="flex flex-wrap gap-2">
+                        {currentDish.ingredients
+                          .slice(0, 5)
+                          .map((ingredient) => (
+                            <span
+                              key={ingredient}
+                              className="
+                                rounded-lg border border-border
+                                bg-bg-soft px-3 py-2
+                                text-xs text-cream/80
+                              "
+                            >
+                              {ingredient}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Actions */}
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Link
+                    href={`/menu/${currentDish.slug}`}
+                    className="w-full sm:w-auto"
+                  >
+                    <Button
+                      variant="primary"
+                      size="default"
+                      magnetic={!isTouch}
+                    >
+                      Explore This Dish
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
 
-                  <Link href="/reservation">
+                  <Link href="/reservation" className="w-full sm:w-auto">
                     <Button variant="secondary" size="default">
-                      Reserve Table
+                      Reserve a Table
                     </Button>
                   </Link>
                 </div>
+
+                {/* Next dish */}
+                {signatureList.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      changeDish((safeIndex + 1) % signatureList.length)
+                    }
+                    className="
+                      mt-6 inline-flex w-fit items-center gap-2
+                      text-xs text-muted transition-colors
+                      hover:text-accent
+                    "
+                  >
+                    Discover the next creation
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
-        </div>
-
-        {/* Mobile Horizontal Snap Indicator */}
-        <div className="mt-8 flex justify-center gap-2 sm:hidden">
-          {signatureList.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveIndex(i)}
-              className={`h-2 rounded-full transition-all ${
-                activeIndex === i ? "w-6 bg-accent" : "w-2 bg-border"
-              }`}
-            />
-          ))}
         </div>
       </Container>
     </section>
