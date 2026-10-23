@@ -5,23 +5,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ease } from "@/lib/animations";
 
 export function Preloader() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If already marked as seen, remove immediately without state thrash
-    const hasLoaded = sessionStorage.getItem("bhojon_preloader_seen");
-    if (hasLoaded) {
-      const id = requestAnimationFrame(() => setLoading(false));
-      return () => cancelAnimationFrame(id);
+    if (localStorage.getItem("bhojon_preloader_seen")) {
+      return;
     }
 
-    const timer = setTimeout(() => {
-      setLoading(false);
-      sessionStorage.setItem("bhojon_preloader_seen", "true");
-    }, 1800);
+    const frame = requestAnimationFrame(() => {
+      localStorage.setItem("bhojon_preloader_seen", "true");
+      setLoading(true);
+    });
 
-    return () => clearTimeout(timer);
+    return () => cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => {
+    if (!loading) return;
+
+    const timer = setTimeout(() => setLoading(false), 1800);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   return (
     <AnimatePresence>
