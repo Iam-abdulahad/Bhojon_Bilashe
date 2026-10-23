@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "seed": "tsx scripts/seed.ts"
@@ -20,7 +20,7 @@
     "lenis": "^1",
     "lucide-react": "^0.500",
     "mongoose": "^8",
-    "next": "16.4.0",
+    "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-hook-form": "^7",
