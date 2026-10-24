@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ["three"],
 };
+module.exports = {
+  allowedDevOrigins: ['192.168.0.106'],
+}
 
 export default withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
