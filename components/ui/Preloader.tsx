@@ -5,20 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ease } from "@/lib/animations";
 
 export function Preloader() {
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem("bhojon_preloader_seen")) {
-      return;
-    }
-
-    const frame = requestAnimationFrame(() => {
-      localStorage.setItem("bhojon_preloader_seen", "true");
-      setLoading(true);
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, []);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!loading) return;
