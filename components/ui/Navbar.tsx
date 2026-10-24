@@ -56,18 +56,21 @@ export function Navbar() {
     }
   }, [mobileMenuOpen]);
 
-  // Handle smooth scroll when clicking the link of the active page
+  // Handle link clicks (both navigation & smooth scrolling)
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     href: string,
   ) => {
+    // 1. Immediately close the mobile menu on first click
+    setMobileMenuOpen(false);
+
+    // 2. If already on the page, prevent navigation & smooth scroll to top
     if (pathname === href) {
       e.preventDefault();
       window.scrollTo({
         top: 0,
         behavior: "smooth",
       });
-      setMobileMenuOpen(false);
     }
   };
 
